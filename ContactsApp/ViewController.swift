@@ -76,6 +76,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let navVC = UINavigationController(rootViewController: rootVC)
         rootVC.nameField.text = contacts[indexPath.row].name!
         rootVC.numberField.text = contacts[indexPath.row].phone!
+        rootVC.title = contacts[indexPath.row].name!
         present(navVC, animated: true)
     }
     
@@ -103,7 +104,34 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     @objc func addTapped(){
-        navigationController?.pushViewController(AddContactVC(), animated: true)
+        let alert = UIAlertController(title: "Add Contact", message: "Enter name and number", preferredStyle: .alert)
+        alert.addTextField{ field in
+            field.placeholder = "Name"
+            field.returnKeyType = .next
+            field.keyboardType = .namePhonePad
+        }
+        alert.addTextField{ field in
+            field.placeholder = "Number"
+            field.returnKeyType = .next
+            field.keyboardType = .numberPad
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { _ in
+            guard let fields = alert.textFields, fields.count == 2 else {
+                return
+            }
+            let nameField = fields[0]
+            let numberField = fields[1]
+            guard let name1 = nameField.text , !name1 .isEmpty,
+                  let number1 = numberField.text , !number1 .isEmpty else{
+                      print("Incorrect data")
+                      return
+                  }
+            self.contacts.append(Contact(name: name1, phone: number1))
+            self.tableView.reloadData()
+        }))
+        
+        present(alert, animated: true)
     }
     
     
